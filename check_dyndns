@@ -1,0 +1,4 @@
+#!/bin/sh
+
+wget -q -O - checkip.dyndns.com | egrep -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
+

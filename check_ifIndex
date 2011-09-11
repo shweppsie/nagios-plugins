@@ -1,0 +1,49 @@
+#!/bin/sh
+
+grep='(10|16)'
+sed='\(10\|16\)'
+interface='internet'
+
+# ignore verbose options
+while getopts ":v" opt; do shift $((OPTIND-1)); done
+
+# parse command line args
+if [ "$1" = "out" ]; then
+	grep="16"
+	sed="\(16\)"
+elif [ "$1" = "in" ]; then
+	grep="10"
+	sed="\(10\)"
+elif [ "$1" != "" ]; then
+	echo "ERROR - I don't understand \"$1\""
+	return 3
+fi
+
+# get snmp id
+real_id=$(snmpwalk -On -c public -v 2c localhost .1.3.6.1.2.1.2.2.1.2 | \
+	grep internet | \
+	sed 's/^\.1.3.6.1.2.1.2.2.1.2.\([0-9]\{1,3\}\) = STRING: '$interface'/\1/g')
+
+# get cacti id
+cacti_ids=$(mysql -u root cacti -e "select arg1 from poller_item where rrd_path = '/var/lib/cacti/rra/localhost_traffic_in_45.rrd'" | \
+	egrep '.1.3.6.1.2.1.2.2.1.'$grep'.[0-9]+' | \
+	sed 's/^\.1.3.6.1.2.1.2.2.1.'$sed'.\([0-9]\{1,3\}\)/\2/g')
+
+# check the ids match
+res=0
+for cacti_id in $cacti_ids; do
+	if [ "$real_id" != "$cacti_id" ]; then
+		res=2
+	fi
+done
+
+# report the result
+if [ $res -eq 0 ]; then
+	echo "OK - Interface IDs for \"$interface\" match"
+	return 0
+else
+	echo "CRITICAL - Cacti and SNMP interface IDs for \"$interface\" no longer match! Graphs will not be generated!"
+	return 2
+fi
+
+

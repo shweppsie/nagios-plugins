@@ -1,9 +1,26 @@
 #!/bin/sh
 
 interface='internet'
+fix='false'
 
 # ignore verbose options
-while getopts ":v" opt; do shift $((OPTIND-1)); done
+while getopts ":vfh" opt; do
+	if [ "$opt" = "f" ]; then
+		fix='true'
+	elif [ "$opt" = "h" ]; then
+		echo "Usage: $0 [-hf]"
+		echo ""
+		echo "-f use experimental ways to fix errors"
+		echo "-h display this help text"
+		echo ""
+		return 3
+	fi
+	shift $((OPTIND-1))
+done
+
+if [ "$fix" = "true" ]; then
+	echo "-f supplied, trying to fix any errors"
+fi
 
 if [ "$1" != "" ]; then
 	echo "ERROR - I don't understand \"$1\""
@@ -36,7 +53,11 @@ if [ $res -eq 0 ]; then
 	echo "OK - Interface IDs for \"$interface\" match"
 	return 0
 else
-	echo "CRITICAL - Cacti and SNMP interface IDs for \"$interface\" no longer match! Graphs will not be generated!"
+	if [ "$fix" = "true" ]; then
+		echo "CRITICAL - Cacti and SNMP interface IDs for \"$interface\" don't match. I don't know how to fix this yet."
+	else
+		echo "CRITICAL - Cacti and SNMP interface IDs for \"$interface\" no longer match! Graphs will not be generated!"
+	fi
 	return 2
 fi
 

@@ -43,8 +43,8 @@ fi
 
 # get cacti id
 cacti_ids=$(mysql -u root cacti -e "select arg1 from poller_item where rrd_path = '/var/lib/cacti/rra/localhost_traffic_in_45.rrd'" | \
-	sed 's/^\.1.3.6.1.2.1.2.2.1.'$sed'.\([0-9]\{1,3\}\)/\2/g')
 	egrep '.1.3.6.1.2.1.2.2.1.(10|16).[0-9]+' | \
+	egrep -o '[0-9]*$')
 
 # check the ids match
 res=0

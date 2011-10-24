@@ -37,7 +37,7 @@ snmp_id=$(snmpwalk -On -c public -v 2c localhost .1.3.6.1.2.1.2.2.1.2 | \
 
 if [ "$real_id" != "$snmp_id" ]; then
 	echo "CRITICAL - kernel and SNMP interface IDs for \"$interface\" do not match. Restarting snmpd..."
-	/usr/sbin/service snmpd restart
+	sudo /usr/sbin/service snmpd restart &> /dev/null
 	exit 2
 fi
 

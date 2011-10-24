@@ -13,7 +13,7 @@ while getopts ":vfh" opt; do
 		echo "-f use experimental ways to fix errors"
 		echo "-h display this help text"
 		echo ""
-		return 3
+		exit 3
 	fi
 	shift $((OPTIND-1))
 done
@@ -24,7 +24,7 @@ fi
 
 if [ "$1" != "" ]; then
 	echo "ERROR - I don't understand \"$1\""
-	return 3
+	exit 3
 fi
 
 # get kernel id
@@ -38,7 +38,7 @@ snmp_id=$(snmpwalk -On -c public -v 2c localhost .1.3.6.1.2.1.2.2.1.2 | \
 if [ "$real_id" != "$snmp_id" ]; then
 	echo "CRITICAL - kernel and SNMP interface IDs for \"$interface\" do not match. Restarting snmpd..."
 	/usr/sbin/service snmpd restart
-	return 2
+	exit 2
 fi
 
 # get cacti id
@@ -57,14 +57,14 @@ done
 # report the result
 if [ $res -eq 0 ]; then
 	echo "OK - Interface IDs for \"$interface\" match"
-	return 0
+	exit 0
 else
 	if [ "$fix" = "true" ]; then
 		echo "CRITICAL - Cacti and SNMP interface IDs for \"$interface\" don't match. I don't know how to fix this yet."
 	else
 		echo "CRITICAL - Cacti and SNMP interface IDs for \"$interface\" no longer match! Graphs will not be generated!"
 	fi
-	return 2
+	exit 2
 fi
 
 

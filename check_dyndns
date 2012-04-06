@@ -1,9 +1,16 @@
 #!/bin/bash
 
+DNSNAME="$1"
+
+if [ "${DNSNAME}" == "" ]; then
+	echo "Please supply a DNS Name to lookup"
+	exit 3
+fi
+
 IPADDR=`wget -q -O - checkip.dyndns.com | egrep -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'`
 if [ $? -ne 0 ]; then echo "DNS WARNING: cannot detect ip address!"; exit 1; fi
 
-MSG=`/usr/lib/nagios/plugins/check_dns -H futurama.mine.nu -s 8.8.8.8 -a $IPADDR`
+MSG=`/usr/lib/nagios/plugins/check_dns -H ${DNSNAME} -s 8.8.8.8 -a ${IPADDR}`
 RES=$?
 
 OUT=`echo "$MSG" | egrep '^DNS CRITICAL.*'`
@@ -11,8 +18,8 @@ if [ $? -ne 0 ]; then
 	echo "$MSG"
 	exit $RES
 else
+	echo "DYNDNS CRITICAL ${DNSNAME} does not resolve to ${IPADDR}, trying to update dyndns now"
 	sudo /usr/sbin/ddclient -syslog -ip $IPADDR &> /dev/null
-	echo "DYNDNS CRITICAL futurama.mine.nu does not resolve to $IPADDR, trying to update dyndns now"
 	exit 2
 fi
 

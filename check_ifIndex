@@ -5,9 +5,9 @@ fix='false'
 
 # ignore verbose options
 while getopts ":vfh" opt; do
-	if [ "$opt" = "f" ]; then
+	if [ "${opt}" = "f" ]; then
 		fix='true'
-	elif [ "$opt" = "h" ]; then
+	elif [ "${opt}" = "h" ]; then
 		echo "Usage: $0 [-hf]"
 		echo ""
 		echo "-f use experimental ways to fix errors"
@@ -18,7 +18,7 @@ while getopts ":vfh" opt; do
 	shift $((OPTIND-1))
 done
 
-if [ "$fix" = "true" ]; then
+if [ "${fix}" = "true" ]; then
 	echo "-f supplied, trying to fix any errors"
 fi
 

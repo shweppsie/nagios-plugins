@@ -1,6 +1,6 @@
 #!/bin/bash
 
-interface='internet'
+interface="$1"
 fix='false'
 
 # ignore verbose options
@@ -22,21 +22,31 @@ if [ "$fix" = "true" ]; then
 	echo "-f supplied, trying to fix any errors"
 fi
 
-if [ "$1" != "" ]; then
-	echo "ERROR - I don't understand \"$1\""
+if [ "${interface}" == "" ]; then
+	echo "ERROR - Please supply an interface"
+	exit 3
+fi
+
+if [ "$2" != "" ]; then
+	echo "Too many arguments!"
 	exit 3
 fi
 
 # get kernel id
-real_id=$(ip addr | grep -o "[0-9]*: $interface" | grep -o '^[0-9]*')
+real_id=$(ip addr | grep -o "[0-9]*: ${interface}" | grep -o '^[0-9]*')
+
+if [ "$real_id" == "" ]; then
+	echo "Interface does not exist!"
+	exit 3
+fi
 
 # get snmp id
 snmp_id=$(snmpwalk -On -c public -v 2c localhost .1.3.6.1.2.1.2.2.1.2 | \
 	grep internet | \
-	sed 's/^\.1.3.6.1.2.1.2.2.1.2.\([0-9]\{1,3\}\) = STRING: '$interface'/\1/g')
+	sed 's/^\.1.3.6.1.2.1.2.2.1.2.\([0-9]\{1,3\}\) = STRING: '${interface}'/\1/g')
 
 if [ "$real_id" != "$snmp_id" ]; then
-	echo "CRITICAL - kernel and SNMP interface IDs for \"$interface\" do not match. Restarting snmpd..."
+	echo "CRITICAL - kernel and SNMP interface IDs for \"${interface}\" do not match. Restarting snmpd..."
 	sudo /usr/sbin/service snmpd restart &> /dev/null
 	exit 2
 fi

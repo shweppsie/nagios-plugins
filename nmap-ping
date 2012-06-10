@@ -32,4 +32,4 @@ echo ${res} | grep "Down"
 echo ${res} | grep "Up"
     [ $? -eq 0 ] && print_exit 0 "Ok"
 
-results_exit 3 "Unknown"
+print_exit 3 "Unknown: $OUTPUT"

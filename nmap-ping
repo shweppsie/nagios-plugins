@@ -22,7 +22,7 @@ print_exit()
     exit $1
 }
 
-[ -x "$BIN" ] || print_exit 255 "Could not find $BIN. Is $NAME installed?"
+[ -x "$BIN" ] || print_exit 3 "Could not find $BIN. Is $NAME installed?"
 
 res=`$BIN $ARGS $1 | grep '^Host' | sed 's/.*Status: \(.*\)$/\1/'`
 

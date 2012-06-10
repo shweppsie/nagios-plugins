@@ -18,7 +18,8 @@ ARGS="-sP -oG -"
 
 print_exit()
 {
-    echo "$NAME check: ${2}"
+    echo -n "$NAME check: ${2}"
+    [ "$3" == "" ] || echo "$3" | tail -n 1 | awk '{print " | " $0}'
     exit $1
 }
 
@@ -31,9 +32,9 @@ OUTPUT=`${BIN} ${ARGS} ${1}`
 res=`echo "$OUTPUT" | sed 's/.*Host: [0-9\.]* (.*) Status: \([a-zA-Z]\) .*/\1/'`
 
 echo "$res" | grep -q "Down"
-    [ $? -eq 0 ] && print_exit 2 "CRITICAL"
+    [ $? -eq 0 ] && print_exit 2 "CRITICAL" "$OUTPUT"
 
 echo "$res" | grep -q "Up"
-    [ $? -eq 0 ] && print_exit 0 "Ok"
+    [ $? -eq 0 ] && print_exit 0 "Ok" "$OUTPUT"
 
 print_exit 3 "Unknown: $OUTPUT"

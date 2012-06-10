@@ -24,12 +24,15 @@ print_exit()
 
 [ -x "$BIN" ] || print_exit 3 "Could not find $BIN. Is $NAME installed?"
 
-res=`$BIN $ARGS $1 | grep '^Host' | sed 's/.*Status: \(.*\)$/\1/'`
 
-echo ${res} | grep "Down"
+OUTPUT=`${BIN} ${ARGS} ${1}`
+
+res=`echo "$OUTPUT" | sed 's/.*Host: [0-9\.]* (.*) Status: \([a-zA-Z]\) .*/\1/'`
+
+echo "$res" | grep -q "Down"
     [ $? -eq 0 ] && print_exit 2 "CRITICAL"
 
-echo ${res} | grep "Up"
+echo "$res" | grep -q "Up"
     [ $? -eq 0 ] && print_exit 0 "Ok"
 
 print_exit 3 "Unknown: $OUTPUT"

@@ -24,6 +24,7 @@ print_exit()
 
 [ -x "$BIN" ] || print_exit 3 "Could not find $BIN. Is $NAME installed?"
 
+[ "$1" == "" ] && print_exit 3 "No Host provided to ping!"
 
 OUTPUT=`${BIN} ${ARGS} ${1}`
 

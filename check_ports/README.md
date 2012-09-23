@@ -2,10 +2,11 @@
 
 ## Dependencies ##
 
-
 This script requires pyasn1 and pysnmp.
 
     $ sudo aptitude install python-pyasn1 python-pysnmp2
+
+## Usage ##
 
 This script checks the status of ports on a cisco 2950, but likely works the same with other cisco switches.
 

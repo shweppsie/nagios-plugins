@@ -28,6 +28,7 @@ errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
     cmdgen.UdpTransportTarget((sys.argv[1], 161)),
     '.1.3.6.1.2.1.2.2.1.7',
     '.1.3.6.1.2.1.2.2.1.8',
+    '.1.3.6.1.2.1.1',
 )
 
 if errorIndication:
@@ -49,11 +50,21 @@ down = 2
 for varBindTableRow in varBindTable:
     for name, val in varBindTableRow:
 	mib = name.asTuple()
-	
+
+	# code to skip 1924s
+	if mib == (1,3,6,1,2,1,1,1,0):
+		if str(val).find('Cisco Systems Catalyst 1900') != -1:
+			print "Skipping 1924 Switch"
+			exit(0)
+
+	# skip the other mibs
+	if len(mib) != 11:
+		continue
+
 	type = mib[-2]
 	port = mib[-1]
 	status = val
-	
+
 	if type == 7: # Admin
 		if status == down:
 			admindown.append(port)
@@ -71,3 +82,4 @@ elif len(admindown) > 1:
 else:
 	print "All Ports are up %s" % (opertext)
 	exit(0)
+

@@ -24,7 +24,7 @@ if len(sys.argv) != 2:
 cmdGen = cmdgen.CommandGenerator()
 
 errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
-    cmdgen.CommunityData('public'),
+    cmdgen.CommunityData('public', mpModel=0),
     cmdgen.UdpTransportTarget((sys.argv[1], 161)),
     '.1.3.6.1.2.1.2.2.1.7',
     '.1.3.6.1.2.1.2.2.1.8',

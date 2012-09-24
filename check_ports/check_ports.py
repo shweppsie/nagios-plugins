@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-from optparse import OptionParser
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 
 if len(sys.argv) != 2:
